@@ -24,13 +24,6 @@ export default function RootLayout({
       <body className={inter.className}>
         <ReduxProvider>
           {children}
-          <ToastContainer
-          position="bottom-right"
-          autoClose={5000}
-          closeOnClick
-          pauseOnHover
-          
-          ></ToastContainer>
         </ReduxProvider>
       </body>
     </html>

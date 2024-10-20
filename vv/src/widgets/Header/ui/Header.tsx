@@ -64,7 +64,7 @@ export default function Header(){
                 {/* block logo+button */}
                 <div className='flex flex-row justify-between'>
                     <div className='flex flex-col'>
-                        <H2 text='+38 (050) 063-35-30' className='text-main font-bold'></H2>
+                        <H2 text='+38 (067) 326-77-50' className='text-main font-bold'></H2>
                         <P text='Пн-Сб: 8:00-17:00'></P>
                     </div>
                     {/* phone number */}

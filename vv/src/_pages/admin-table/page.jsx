@@ -10,7 +10,6 @@ import { uploadImg } from "@/shared/utils/api/requests";
 
 import { getTable, sendTable } from "@/shared/utils/api/requests";
 import { H1, H2 } from "@/shared/ui";
-import { toast } from "react-toastify";
 
 export default function AdminTablePage() {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -384,12 +383,7 @@ export default function AdminTablePage() {
                 Повернути останню збережену версію
               </button>
               <button className="buttonTable" onClick={async () => {
-                try{
                   await sendTable(jsonData)
-                  toast("Nice!", {type: "success"})
-                } catch {
-
-                }
               }} disabled={currentStep === 0}>
                 Зберегти
               </button>
