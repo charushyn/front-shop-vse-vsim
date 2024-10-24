@@ -18,13 +18,9 @@ export default function ProductPage() {
     const req = async () => {
       const item = await getProductByID({productID: +params.productID})
 
-      console.log(item)
-
       if(item.has_offers){
         const offers:Array<any> = (await getOffers({product_id: item.id})).data
-        console.log(offers)
         setAvailableOffers(offers)
-        console.log(offers)
       }
 
       setProduct(item)
@@ -32,8 +28,6 @@ export default function ProductPage() {
 
     req()
   }, [])
-  console.log(params)
-  // return <p>ProductID: {params.productID}</p>
 
   return (
     <div className='px-4 flex flex-col'>

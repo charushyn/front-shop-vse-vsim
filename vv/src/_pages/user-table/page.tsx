@@ -19,7 +19,6 @@ import {
 
 export default function UserTablePage(){
   const [data, setData] = React.useState(Array<Array<any>>)
-  const [zoomPhoto, setZoomPhoto] = React.useState('')
 
   React.useEffect(() => {
     const res = async () => {
@@ -54,7 +53,7 @@ export default function UserTablePage(){
       </div>
       <div className="flex justify-center">
         <Table className="">
-          {data.map((array, i) => {
+          {data?.map((array, i) => {
             return (
               <TableRow className="text-center">
                 {
