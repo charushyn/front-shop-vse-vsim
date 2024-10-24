@@ -1,11 +1,9 @@
 import axios from "axios";
 
-// const CRM_URL = 'https://openapi.keycrm.app/v1'
-// const CRM_TOKEN = 'MGQ0YTcxZjVjMjQyYWE4YWRlYjczY2I4YWU0NTM4NmY2MGZhMThhYQ'
-// axios.defaults.baseURL = CRM_URL
+const backendUrl = 'https://backend.vsevsim.com.ua'
 
 const crm_instanse = axios.create({
-    baseURL: 'http://localhost:8000',
+    baseURL: backendUrl,
     headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE',
@@ -15,7 +13,7 @@ const crm_instanse = axios.create({
 })
 
 const auth_instance = axios.create({
-    baseURL: 'http://localhost:8000',
+    baseURL: backendUrl,
     headers: {
         'Access-Control-Allow-Origin': '*',
         'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE',
