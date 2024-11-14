@@ -1,7 +1,7 @@
 import { cn } from "@/shared/utils/index"
 
-export default function H1({text, className} : {text: string, className?: string}){
+export default function H1({className, children} : {className?: string, children: React.ReactNode}){
     return(
-        <h1 className={cn(className, ' m-s:text-base t-m:text-xl')}>{text}</h1>
+        <h1 className={cn(className, 'm-s:text-base t-m:text-xl')}>{children}</h1>
     )
 }

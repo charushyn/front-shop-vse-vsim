@@ -1,9 +1,9 @@
 import MainPage from "./main/page";
-import CategoryPage from "./categoryID/page";
+import ProductsPage from "./products/page";
 import ProductPage from "./productID/page";
-import Login from "./login/page";
-import AdminPage from "./admin/page";
 import TablePage from "./user-table/page"
-import AdminTablePage from "./admin-table/page"
+import CartPage from "./cart/page";
+import PrivacyPolicyPage from "./privacypolicy/page";
+import SuccessOrder from "./success-order/page";
 
-export {MainPage, CategoryPage, ProductPage, Login, AdminTablePage, TablePage, AdminPage}
+export {MainPage, ProductsPage, ProductPage, TablePage, CartPage, PrivacyPolicyPage, SuccessOrder}

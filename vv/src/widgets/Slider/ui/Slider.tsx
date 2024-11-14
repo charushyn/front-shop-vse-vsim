@@ -17,6 +17,7 @@ export default function Slider(){
                     <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
                     </svg>
                 </div>
+                
             </div>
             <div className="z-[-1] w-full h-full relative">
                 <img src={imgs[index]} className={`w-full h-full object-cover absolute`}></img>

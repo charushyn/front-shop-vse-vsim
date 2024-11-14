@@ -1,5 +1,6 @@
 import Main from "./Main/Main";
-import categoryID from "./categoryID/categoryID";
+import products from "./products/products";
 import productID from "./productID/productID";
+import PrivacyPolicy from "./privacypolicy/PrivacyPolicy";
 
-export {Main, categoryID, productID}
+export {Main, products, productID, PrivacyPolicy}

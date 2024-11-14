@@ -1,3 +1,3 @@
-import CategoryLine from "./CategoryLine/ui/CategoryLine";
+import Map from "./LeafletMap/ui/LeafletMap";
 
-export {CategoryLine}
+export {Map}

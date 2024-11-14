@@ -4,6 +4,6 @@ import H2 from "./h2/h2";
 import CustomLink from "./link/link";
 import A from "./a/a";
 import Button from "./button/button";
-import CartCount from "./CartCount/CartCount";
+import CountBar from "./CountBar/CountBar";
 
-export {P, H1, H2, CustomLink, A, Button, CartCount}
+export {P, H1, H2, CustomLink, A, Button, CountBar}

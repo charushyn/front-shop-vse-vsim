@@ -1,6 +1,9 @@
 import axios from "axios";
+import axiosThrottle from 'axios-request-throttle';
 
-const backendUrl = 'https://backend.vsevsim.com.ua'
+axiosThrottle.use(axios, {requestsPerSecond: 1})
+
+const backendUrl = 'http://localhost:8000'
 
 const crm_instanse = axios.create({
     baseURL: backendUrl,
@@ -12,82 +15,8 @@ const crm_instanse = axios.create({
     withCredentials: true,
 })
 
-const auth_instance = axios.create({
-    baseURL: backendUrl,
-    headers: {
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE',
-        'Access-Control-Allow-Headers': 'Content-Type',
-    },
-    withCredentials: true,
-})
+
 axios.defaults.headers.common = {
-}
-
-export const login = async (login: string, password: string) => {
-    
-    try{
-        const res = await auth_instance.post('/login', {
-            login,
-            password
-        })
-        return res
-    } catch(error){
-        console.log(error)
-    }
-}
-
-export const uploadImg = async (img: File) => {
-    const body = new FormData()
-    body.append('file', img)
-
-    try{
-        const res = await auth_instance.post('/add-img', body)
-        return res.data
-    } catch(error){
-        console.log(error)
-    }
-}
-
-export const deleteImgTable = async (filename: string) => {
-    try{
-        const res = await auth_instance.post('/delete-img', {filename})
-        return res.data
-    } catch(error){
-        console.log(error)
-    }
-}
-
-
-
-export const getTable = async () => {
-    
-    try{
-        const res = await auth_instance.get('/table')
-        return res
-    } catch(error){
-        console.log(error)
-    }
-}
-
-export const sendTable = async (data: Array<Array<any>>) => {
-    
-    try{
-        const res = await auth_instance.post('/table', data)
-        return res
-    } catch(error){
-        console.log(error)
-    }
-}
-
-export const verify = async () => {
-    
-    try{
-        const res = await auth_instance.get('/verify')
-        return res.data
-    } catch(error){
-        console.log(error, 'error verify')
-    }
 }
 
 
@@ -132,16 +61,23 @@ export const getOffers = async ({product_id} : {product_id?: number}) => {
 }
 
 
-export const getProducts = async ({categoriesID, limit} : {categoriesID?: Array<number>, limit?:number}) => {
+export const getProducts = async ({categoriesID, limit, sort, customFields} : {categoriesID?: Array<number>, limit?:number, sort?: 'byQuantity', customFields?: boolean }) => {
 
     const params = {
         filter: categoriesID && {"category_id": `${categoriesID.toString()}`},
-        limit: limit
+        include: customFields && {"include": `customFields`},
+        limit: typeof limit === "number" ? limit + 5 : ''
     }
     
     try{
         const res = await crm_instanse.get('/crm/products', {params: params})
-        return res.data.data
+
+        if(sort === "byQuantity" && res.data.data.length > 1){
+            const sortedArray = res.data.data.sort((a: any, b: any) => b.quantity - a.quantity)
+            return sortedArray
+        } else {
+            return res.data.data
+        }
     } catch(error){
         console.log(error)
     }

@@ -16,7 +16,7 @@ export default function CustomLink({className, variant, text, href} : {className
         case 'outline':
             return(
                 <Lin href={href} className={cn('text-center font-bold py-2 px-4 rounded-full bg-white text-black border-[1.5px] border-main', className)}>
-                    <P text={text}></P>
+                    <P>{text}</P>
                 </Lin>
             )
     }
