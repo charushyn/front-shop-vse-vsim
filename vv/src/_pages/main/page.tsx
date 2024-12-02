@@ -1,13 +1,12 @@
-import { Slider, Warning, Products, About, BulkPreview } from "@/widgets/index";
+import { Slider, Warning, Products, About } from "@/widgets/index";
 
-export default function MainPage(){
-    return(
-        <div className="">
-            <Warning></Warning>
-            <Slider></Slider>
-            <Products></Products>
-            <About></About>
-            <BulkPreview></BulkPreview>
-        </div>
-    )
+export default function MainPage() {
+  return (
+    <div className="">
+      <Warning></Warning>
+      <Slider></Slider>
+      <Products></Products>
+      <About></About>
+    </div>
+  );
 }

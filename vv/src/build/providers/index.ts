@@ -1,3 +1,3 @@
 import ReduxProvider from "./Redux/provider";
 
-export {ReduxProvider}
+export { ReduxProvider };

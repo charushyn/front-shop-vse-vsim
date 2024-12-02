@@ -31,7 +31,6 @@
 //             return NextResponse.redirect(`${process.env.FRONTEND}/login`)
 //           }
 
-          
 //     }
 
 //     if(request.nextUrl.pathname.includes('login')){
@@ -50,7 +49,7 @@
 //                return data.json()
 //             }
 //             throw new Error()
-//           }).catch((e) => 
+//           }).catch((e) =>
 //               console.log(e)
 //             )
 

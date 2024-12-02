@@ -5,10 +5,10 @@ import { cn } from "@/shared/utils/index";
 
 import { ReduxProvider } from "@/build/providers";
 
-import { Bounce, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import { Bounce, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
-import {headers} from "next/headers"
+import { headers } from "next/headers";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -22,15 +22,16 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
-  const headerList = headers()
-  
+  const headerList = headers();
 
   return (
-    <html lang="en" className="">
+    <html lang="en">
       <body className={inter.className}>
         <ReduxProvider>
+          {/* <SidebarProvider> */}
+          {/* <AppSidebar></AppSidebar> */}
           {children}
+          {/* </SidebarProvider> */}
           <ToastContainer />
         </ReduxProvider>
       </body>

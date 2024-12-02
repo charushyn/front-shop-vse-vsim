@@ -1,15 +1,16 @@
-import { Header , Footer} from "@/widgets/index";
+import { SidebarProvider, SidebarTrigger } from "@/shared/uiShadcn/sidebar";
+import { Header, Footer } from "@/widgets/index";
 
 export default function MainLayout({
-    children,
-  }: Readonly<{
-    children: React.ReactNode;
-  }>) {
-    return (
-      <>
-        <Header></Header>
-        {children}
-        <Footer></Footer>
-      </>
-    );
-  }
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  return (
+    <>
+      <Header></Header>
+      {children}
+      <Footer></Footer>
+    </>
+  );
+}

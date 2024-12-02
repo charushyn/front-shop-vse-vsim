@@ -1,270 +1,388 @@
-'use client'
+"use client";
 
-import { Product } from '@/shared/types/Product'
-import { H1, P, H2, CountBar } from '@/shared/ui'
-import { getOffers, getProductByID } from '@/shared/utils/api/requests'
-import Link from 'next/link'
-import { useParams } from 'next/navigation'
+import { Product } from "@/shared/types/Product";
+import { H1, P, H2, CountBar } from "@/shared/ui";
+import { getOffers, getProductByID } from "@/shared/utils/api/requests";
+import Link from "next/link";
+import { useParams } from "next/navigation";
 
-import {Button} from '@/shared/ui'
+import { Button } from "@/shared/uiShadcn/button";
 
-import React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
-import { addItem } from '@/shared/utils/redux/productCart/productCart'
-import { toast } from 'react-toastify'
+import React from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { addItem } from "@/shared/utils/redux/productCart/productCart";
+import { toast } from "react-toastify";
 
-import FadeLoader from "react-spinners/FadeLoader"
+import { Wallet } from "lucide-react";
 
-import { useRouter } from 'next/navigation'
- 
+import FadeLoader from "react-spinners/FadeLoader";
+
+import { useRouter } from "next/navigation";
+
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+  CarouselApi,
+} from "@/shared/uiShadcn/carousel";
+import { Heart, RotateCw } from "lucide-react";
+
+import {
+  TypographyH4,
+  TypographyLarge,
+  TypographyP,
+} from "@/shared/uiShadcn/typography";
+
+import Autoplay from "embla-carousel-autoplay";
+
+import { RotateCcwIcon, Truck } from "lucide-react";
+
+import { Card, CardContent } from "@/shared/uiShadcn/card";
+import { ProductSheet } from "@/entities";
+import { Offer, Property } from "@/shared/types/Offer";
+import { ProductSheetType } from "@/shared/types/ProductSheet";
+
 export default function ProductPage() {
-  const [product, setProduct] = React.useState<Product>(Object)
-  const [availableOffers, setAvailableOffers] = React.useState(Array<{name: string, value: string}>)
+  const [product, setProduct] = React.useState<Product>(Object);
+  const [availableOffers, setAvailableOffers] = React.useState(Array<Offer>);
 
-  const [slideIndex, setSlideIndex] = React.useState(0)
+  const [api, setApi] = React.useState<CarouselApi>();
+  const [current, setCurrent] = React.useState(0);
+  const [count, setCount] = React.useState(0);
 
-  const [activeNav, setActiveNav] = React.useState(false)
-  const [modalProduct, setModalProduct] = React.useState<any>(Object)
+  const [activeNav, setActiveNav] = React.useState(false);
+  const [modalProduct, setModalProduct] =
+    React.useState<ProductSheetType>(Object);
 
-  const [itemCount, setItemCount] = React.useState(1)
+  const [itemCount, setItemCount] = React.useState(1);
 
-  const [isLoading, setIsLoading] = React.useState(true)
+  const [isLoading, setIsLoading] = React.useState(true);
 
-  const [showAllDescription, setShowAllDescrition] = React.useState(false)
+  const [showAllDescription, setShowAllDescrition] = React.useState(false);
 
+  const dispatch = useDispatch();
 
-  const dispatch = useDispatch()
+  const router = useRouter();
 
-  const router = useRouter()
-  
+  const cart = useSelector((state: any) => state.cartReducer.cart);
 
-  const cart = useSelector((state: any) =>  state.cartReducer.cart)
-  
-  const params = useParams()
+  const params = useParams();
 
   React.useEffect(() => {
-    const productIndexInCart = cart.findIndex((cartItem: {item: Product, quantity: number}) => product.id === cartItem.item.id)
+    const productIndexInCart = cart.findIndex(
+      (cartItem: { item: Product; quantity: number }) =>
+        product.id === cartItem.item.id
+    );
 
-    if(productIndexInCart === -1){
-      return
+    if (productIndexInCart === -1) {
+      return;
     } else {
-      setItemCount(cart[productIndexInCart].quantity)
+      setItemCount(cart[productIndexInCart].quantity);
     }
-  }, [])
+  }, []);
 
   React.useEffect(() => {
     const req = async () => {
-      const item = await getProductByID({productID: +params.productID})
+      const item = await getProductByID({ productID: +params.productID });
 
-      if(item.has_offers){
-        const offers:Array<any> = (await getOffers({product_id: item.id})).data
-        setAvailableOffers(offers)
+      if (item.has_offers) {
+        const offers: Array<any> = (await getOffers({ product_id: item.id }))
+          .data;
+        setAvailableOffers(offers);
       }
 
-      setProduct(item)
-      setIsLoading(false)
+      setProduct(item);
+      setIsLoading(false);
+    };
+
+    req();
+  }, []);
+
+  React.useEffect(() => {
+    if (!api) {
+      return;
     }
 
-    req()
-  }, [])
+    setCount(api.scrollSnapList().length);
+    setCurrent(api.selectedScrollSnap() + 1);
+
+    api.on("select", () => {
+      setCurrent(api.selectedScrollSnap() + 1);
+    });
+  }, [api]);
 
   return (
-    <div className='px-4 flex flex-col'>
-        {
-          <div className={`bg-gray ${activeNav ? 'bg-opacity-50' : 'bg-opacity-0'} flex t-s:justify-center transition-[background-color] duration-300 h-full w-full fixed overflow-y-scroll overflow-x-hidden top-0 left-0 right-0 ${activeNav ? 'opacity-100 z-[100]' : 'opacity-0 z-[-100]'}`} onClick={(e: React.MouseEvent<HTMLDivElement>) => {
-                        setActiveNav(false)
-                        }}>
-                        {/* body popup */}
-                        <div className={`bg-white h-fit p-4 m-4 d-s:w-[50svw] relative ${activeNav ? 'opacity-100' : 'opacity-0'}  transition-opacity top-0 duration-1000 t-s:p-8`} onClick={(e: React.MouseEvent<HTMLDivElement>) => {
-                            e.stopPropagation();
-                            }}>
-                            {
-                              
-                            }
-                            <div className='flex flex-col'>
-                              <div className='flex justify-end'>
-                                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6" onClick={() => {
-                                  setActiveNav(false)
-                                }}>
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18 18 6M6 6l12 12" />
-                                </svg>
-                              </div>
-                              <img src={modalProduct.thumbnail_url} className='w-full h-[200px] object-contain mb-4 mt-4 d-s:h-[400px]'></img>
-                              {
-                                product.has_offers ? <H2>{`${product.name} ${modalProduct.properties?.map((property: {name: string, value: string}) => {return ` ${property.value}`})}.`}</H2>
-                                :
-                                <H2>{`${product.name}`}</H2>
-                              }
-                              
-                              <H2 className='font-bold mt-4'>{`${modalProduct.price}.00 грн`}</H2>
-                              <div className='flex flex-row gap-2 items-center justify-center mt-4 mb-2'>
-                                <CountBar count={itemCount} funcAdd={() => {
-                                    if(itemCount < modalProduct.quantity){
-                                      setItemCount(itemCount + 1)
-                                    }
-                                }} funcMinus={() => {
-                                  if(itemCount - 1 === 0){
-                                    setActiveNav(false)
-                                  } else {
-                                    setItemCount(itemCount - 1)
-                                  }
-                                }}></CountBar>
-                                </div>
-                              <div className='flex justify-center mb-4'>
-                                <P>{`В наявності: ${modalProduct.quantity} шт`}</P>
-                              </div>
-                              <Button text={"Додати у кошик"} variant="default" className='d-s:w-fit d-s:px-10 d-s:py-6 self-center' onClick={() => {
-                                  if(product.has_offers){
-                                    try{
-                                      dispatch(addItem({item: {name: product.name, ...modalProduct}, quantity: itemCount}))
-                                      toast('Услішно!', {type: 'success', onClose: () => setActiveNav(false), autoClose: 500})
-                                    } catch(e: any) {
-                                      toast(e.message, {type: "warning"})
-                                    }
-                                  } else {
-                                    try{
-                                      dispatch(addItem({item: modalProduct, quantity: itemCount}))
-                                      toast('Услішно!', {type: 'success', onClose: () => setActiveNav(false), autoClose: 500})
-                                    } catch(e: any) {
-                                      toast(e.message, {type: "warning"})
-                                    }
-                                    
-                                  }
-                                  
-                              }}></Button>
-                              <div className='flex flex-col gap-2 my-4'>
-                                <H2 className='font-bold'>Опис:</H2>
-                                <div className='h-[1px] bg-light_gray'></div>
-                                <P className='tracking-wider whitespace-pre-line break-words'>{product.description}</P>
-                              </div>
-                            </div>
-                        </div>
-                    </div>
-        }
-        <div className='flex flex-row gap-2 items-center mt-4 mb-2 cursor-pointer' onClick={() => {
-            window.history.back()
-          }}>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M6.75 15.75 3 12m0 0 3.75-3.75M3 12h18" />
-          </svg>
-          <H2>Назад</H2>
-        </div>
-        <Link href={'/'} className='flex flex-row justify-center gap-4 bg-main rounded-xl text-white py-4 items-center mt-4 t-l:w-fit px-10'>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-10">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
-          </svg>
-          <H1 className='font-bold'>Каталог товарів</H1>
-        </Link>
-        {
-          isLoading ?
-          <FadeLoader></FadeLoader>
-          :
-        <div className='flex flex-col'>
-        
-          <H1 className='font-bold text-center mt-10 mb-4 d-s:mb-10'>{product.name}</H1>
-          <div className='flex flex-col t-l:flex-row'>
-                <div className={`relative w-full flex flex-row items-center min-h-[50svh] d-s:w-[40svw] ${!product.has_offers && 'mx-auto'}`}>
-                    {
-                      product.attachments_data.length > 1 &&
-                      <div className="absolute w-8 h-8 flex justify-center items-center left-2" onClick={() => {
-                        if(slideIndex === 0){
-                          setSlideIndex(product?.attachments_data?.length - 1)
-                        } else {
-                          setSlideIndex(slideIndex - 1)
-                        }
-                      }}>
-                          <div className="bg-white opacity-50 rounded-full w-full h-full absolute"></div>
-                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 absolute">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 19.5 8.25 12l7.5-7.5" />
-                          </svg>
-                      </div>
-                    }
-                    
-                      <img src={product?.attachments_data?.[slideIndex]} className=' object-contain max-h-[50svh] w-full'></img>
-                      <div className='absolute bottom-0 w-full text-center'>
-                        <P className='mx-auto'>{slideIndex + 1}/{product.attachments_data.length}</P>
-                      </div>
-                      {
-                        product.attachments_data.length > 1 &&
-                        <div className="absolute w-8 h-8 flex justify-center items-center right-2" onClick={() => {
-                        if(slideIndex === product?.attachments_data?.length - 1){
-                          setSlideIndex(0)
-                        } else {
-                          setSlideIndex(slideIndex + 1)
-                        }
-                      }}>
-                          <div className="bg-white opacity-50 rounded-full w-full h-full absolute"></div>
-                          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6 absolute">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="m8.25 4.5 7.5 7.5-7.5 7.5" />
-                          </svg>
-                      </div>
-                      }
-                      
+    <div className="px-4 d-s:px-8 flex flex-col">
+      <ProductSheet
+        open={activeNav}
+        toggleFn={() => setActiveNav(!activeNav)}
+        product={modalProduct}
+      ></ProductSheet>
+      <div
+        className="flex flex-row gap-2 items-center mt-4 mb-2 cursor-pointer w-fit"
+        onClick={() => {
+          window.history.back();
+        }}
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+          className="size-6"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M6.75 15.75 3 12m0 0 3.75-3.75M3 12h18"
+          />
+        </svg>
+        <H2>Назад</H2>
+      </div>
+      <Button className="relative py-4 items-center my-4 t-m:w-fit px-10 gap-4">
+        <a href="/products" className="absolute w-full h-full flex-row"></a>
+        <TypographyP>Каталог товарів</TypographyP>
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={1.5}
+          stroke="currentColor"
+          className="size-10"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"
+          />
+        </svg>
+      </Button>
+      {isLoading ? (
+        <FadeLoader></FadeLoader>
+      ) : (
+        <div className="flex flex-col t-m:grid t-m:grid-cols-2 t-m:grid-rows-2 gap-4">
+          {product.attachments_data.length > 0 && (
+            <div className=" col-start-1 col-end-2 row-start-1 row-end-3">
+              <Carousel setApi={setApi} className="relative">
+                <CarouselContent>
+                  {product.attachments_data.map((img: string) => {
+                    return (
+                      <CarouselItem key={img}>
+                        <Card>
+                          <CardContent className="p-0">
+                            <img
+                              src={img}
+                              className="w-full h-[300px] t-l:h-[370px] d-s:h-[450px] d-m:h-[520px] rounded-2xl object-contain"
+                            ></img>
+                          </CardContent>
+                        </Card>
+                      </CarouselItem>
+                    );
+                  })}
+                </CarouselContent>
+                <CarouselPrevious className="absolute left-4" />
+                <CarouselNext className="absolute right-4" />
+              </Carousel>
+              <div className="flex flex-row gap-2 items-center justify-center mt-4">
+                {product.attachments_data.map((img: string, index: number) => {
+                  if (current - 1 === index) {
+                    return (
+                      <div className="bg-main bg-opacity-50 h-3 w-3 rounded-full"></div>
+                    );
+                  } else {
+                    return (
+                      <div className="bg-black bg-opacity-50 h-2 w-2 rounded-full"></div>
+                    );
+                  }
+                })}
               </div>
-              {
-                product.has_offers &&
-                <div id="offers">
-                  <H1 className={`mt-4 mb-2 font-bold d-s:font-medium ${window.location.href.includes("offers") ? 'text-red-700' : ''}`}>{'Оберіть варіант товару:'}</H1>
-                  <div className='h-[1px] bg-light_gray'></div>
-                  <div className='flex flex-row gap-2 items-center my-2'>
-                    <P>Від</P>
-                    <H2 className='font-bold'>{`${product.min_price} грн`}</H2>
-                    <P>до</P>
-                    <H2 className='font-bold'>{`${product.max_price} грн`}</H2>
+              {/* desc for t-m:+ */}
+              <div className="flex-col gap-2 my-4 hidden t-m:flex t-m:col-start-1 t-m:col-end-2 t-m:row-start-2 t-m:row-end-4">
+                <TypographyH4 className="font-bold">Опис:</TypographyH4>
+                <div className="h-[1px] bg-light_gray"></div>
+                <TypographyP
+                  className={`whitespace-pre-line break-words ${
+                    !showAllDescription && "line-clamp-6"
+                  } h-fit`}
+                >
+                  {product.description}
+                </TypographyP>
+                {!showAllDescription && (
+                  <div onClick={() => setShowAllDescrition(true)}>
+                    <H2 className="underline">Показати увесь опис</H2>
                   </div>
-                  <div className='flex flex-col gap-2 max-h-[190px] overflow-y-auto'>
-                    {
-                      availableOffers.map((offer: any) => {
-                        if(offer.quantity !== 0){
-                          return (
-                            <button className='flex flex-row gap-2 bg-light_gray font-bold rounded-lg p-2 items-center text-left' onClick={() => {
-                              setModalProduct(offer)
-                              setActiveNav(true)
-                            }}>
-                              <img src={offer.thumbnail_url} className='h-[60px] w-[60px] bg-white p-1 rounded-lg'></img>
-                              <P>{`${product.name} ${offer.properties.map((property: {name: string, value: string}) => {return ` ${property.value}`})}. ${offer.price} грн`}</P>
-                            </button>
-                          )
-                        }
-                      })
+                )}
+              </div>
+            </div>
+          )}
+          <div className="flex flex-col gap-4 t-m:col-start-2 t-m:col-end-3 t-m:row-start-1 t-m:row-end-3">
+            <TypographyH4 className="font-bold">{product.name}</TypographyH4>
+            {product.has_offers &&
+              product.quantity - product.in_reserve !== 0 && (
+                <div className="border border-light_gray rounded-2xl flex flex-col gap-2 p-2 max-h-[200px] t-l:max-h-[250px] overflow-y-scroll t-l:p-4">
+                  <TypographyLarge className="">
+                    Варіанти товару:
+                  </TypographyLarge>
+                  {availableOffers.map((item: Offer) => {
+                    if (item.quantity === 0) {
+                      return;
                     }
-                  </div>
+                    return (
+                      <div
+                        className="flex flex-row gap-2 border border-light_gray rounded-2xl items-center cursor-pointer"
+                        onClick={() => {
+                          setActiveNav(true);
+                          setModalProduct({
+                            name: product.name,
+                            description: product.description,
+                            ...item,
+                          });
+                        }}
+                      >
+                        <img
+                          src={item.thumbnail_url}
+                          className="w-[60px] h-[60px] t-l:w-[100px] t-l:h-[100px]"
+                        ></img>
+                        {item.properties.map(
+                          (property: Property, indexProperty: number) => {
+                            return (
+                              <TypographyP>{`${property.name}: ${
+                                property.value
+                              }${
+                                indexProperty === item.properties.length - 1
+                                  ? "."
+                                  : ", "
+                              }`}</TypographyP>
+                            );
+                          }
+                        )}
+                      </div>
+                    );
+                  })}
                 </div>
-              }
+              )}
+            <div className="border border-light_gray rounded-2xl flex flex-col t-l:flex-row gap-2 p-2 t-l:items-center t-l:p-4 t-l:gap-4">
+              <div className="flex flex-row justify-between items-center">
+                <div className="flex flex-col">
+                  <TypographyP
+                    className={
+                      product.quantity - product.in_reserve !== 0
+                        ? product.quantity - product.in_reserve <= 10
+                          ? "text-red-700 font-light"
+                          : "text-green-700 font-light"
+                        : "text-black text-opacity-50 font-light"
+                    }
+                  >
+                    {product.quantity - product.in_reserve !== 0
+                      ? product.quantity - product.in_reserve <= 10
+                        ? "Закінчується"
+                        : "В наявності"
+                      : "Немає в наявності"}
+                  </TypographyP>
+                  <TypographyLarge className="font-bold">
+                    {product.has_offers
+                      ? `${
+                          product.min_price === product.max_price
+                            ? product.min_price
+                            : `від ${product.min_price} ₴ до ${product.max_price}`
+                        } ₴`
+                      : `${product.price} ₴`}
+                  </TypographyLarge>
+                </div>
+                <Heart className="cursor-pointer hover:text-red-700 t-l:hidden"></Heart>
+              </div>
+
+              <Button
+                disabled={
+                  product.quantity - product.in_reserve !== 0 ? false : true
+                }
+                variant="default"
+                className="flex flex-row gap-4 items-center t-l:w-fit d-s:px-10 d-s:py-6 d-s:self-center"
+                onClick={() => {
+                  if (product.has_offers) {
+                    toast("Оберіть варіант товару", { type: "warning" });
+                  } else {
+                    setModalProduct(product);
+                    setActiveNav(true);
+                  }
+                }}
+              >
+                Додати у кошик
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  strokeWidth={1.5}
+                  stroke="currentColor"
+                  className="size-8"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 0 0-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 0 0-16.536-1.84M7.5 14.25 5.106 5.272M6 20.25a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Zm12.75 0a.75.75 0 1 1-1.5 0 .75.75 0 0 1 1.5 0Z"
+                  />
+                </svg>
+              </Button>
+              <Heart className="hidden cursor-pointer hover:text-red-700 t-l:block"></Heart>
             </div>
-          
-          
-        </div>
-        }
-      
-      
-        <div className='flex flex-col gap-2 my-4'>
-          <H2 className='font-bold'>Опис:</H2>
-          <div className='h-[1px] bg-light_gray'></div>
-          <P className={`tracking-wider whitespace-pre-line break-words ${!showAllDescription && 'line-clamp-6'}`}>{product.description}</P>
-          {
-            !showAllDescription &&
-            <div onClick={() => setShowAllDescrition(true)}>
-              <H2 className='underline'>Показати увесь опис</H2>
+            <div className="border border-light_gray rounded-2xl">
+              <div className="border-b-light_gray border-b flex flex-row gap-4 p-2 items-center t-l:p-4">
+                <Truck className="min-w-6 min-h-6"></Truck>
+                <div className=" break-words">
+                  <TypographyP className="font-semibold inline mr-1">
+                    Доставка:
+                  </TypographyP>
+                  <TypographyP className="inline">
+                    Нова Пошта у відділення
+                  </TypographyP>
+                </div>
+              </div>
+              <div className="border-b-light_gray border-b flex flex-row gap-4 p-2 items-center t-l:p-4">
+                <RotateCw className="min-w-6 min-h-6"></RotateCw>
+                <div className=" break-words">
+                  <TypographyP className="font-semibold inline mr-1">
+                    Повернення:
+                  </TypographyP>
+                  <TypographyP className="inline">
+                    Протягом 14 днів після отримання
+                  </TypographyP>
+                </div>
+              </div>
+              <div className="border-b-light_gray border-b flex flex-row gap-4 p-2 items-center t-l:p-4">
+                <Wallet className="min-w-6 min-h-6"></Wallet>
+                <div className=" break-words">
+                  <TypographyP className="font-semibold inline mr-1">
+                    Оплата:
+                  </TypographyP>
+                  <TypographyP className="inline">
+                    Оплата при отриманні, Банківською картою
+                  </TypographyP>
+                </div>
+              </div>
             </div>
-          }
+          </div>
         </div>
-      {
-        !product.has_offers &&
-        <Button disabled={product.quantity > 0 ? false : true} text={product.has_offers ? 'Перейти до товару' : "Додати у кошик"} variant="default" className='mb-10 d-s:w-fit d-s:px-10 d-s:py-6 d-s:self-center' onClick={() => {
-          console.log(product)
-            setModalProduct(product)
-            setActiveNav(true)
-          
-      }}></Button>
-      }
-      {
-        product.has_offers &&
-        <Link href={'#offers'} aria-disabled={product.quantity > 0 ? false : true} className='mb-10 text-center font-bold py-2 px-4 rounded-full bg-main text-white d-s:w-fit d-s:px-10 d-s:py-6 d-s:self-center' onClick={() => {
-          
-          
-      }}>{product.has_offers ? 'Перейти до товару' : "Додати у кошик"}</Link>
-      }
+      )}
+
+      <div className="flex flex-col gap-2 my-4 t-m:hidden">
+        <TypographyH4 className="font-bold">Опис:</TypographyH4>
+        <div className="h-[1px] bg-light_gray"></div>
+        <TypographyP
+          className={`whitespace-pre-line break-words t-m:hidden ${
+            !showAllDescription && "line-clamp-6"
+          }`}
+        >
+          {product.description}
+        </TypographyP>
+        {!showAllDescription && (
+          <div onClick={() => setShowAllDescrition(true)}>
+            <H2 className="underline">Показати увесь опис</H2>
+          </div>
+        )}
+      </div>
     </div>
-  )
+  );
 }

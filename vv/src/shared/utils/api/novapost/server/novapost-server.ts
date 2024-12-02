@@ -1,3 +1,5 @@
+'use server'
+
 import axios from "axios";
 
 const novapostUrl = 'https://api.novaposhta.ua/v2.0/json/'
@@ -9,46 +11,6 @@ const novapostInstance = axios.create({
         "Content-Type": 'application/json',
     },
 })
-
-export const getCity = async ({cityName} : {cityName: string}) => {
-    
-    try{
-        const res = await novapostInstance.post('', {
-            "apiKey": process.env.NP_SECRET,
-            "modelName": "AddressGeneral",
-            "calledMethod": "searchSettlements",
-            "methodProperties": {
-                 "CityName" : cityName,
-                 "Limit" : "50",
-                 "Page" : "1"
-            }
-         })
-        return res
-    } catch(error){
-        console.log(error)
-    }
-}
-
-export const getDepartament = async ({cityRef, inputValue,  TypeOfWarehouseRef} : {cityRef: string, inputValue: string,  TypeOfWarehouseRef?: string}) => {
-    
-    try{
-        const res = await novapostInstance.post('', {
-            "apiKey": process.env.NP_SECRET,
-            "modelName": "AddressGeneral",
-            "calledMethod": "getWarehouses",
-            "methodProperties": {
-                "TypeOfWarehouseRef": TypeOfWarehouseRef ? TypeOfWarehouseRef : null,
-                 "SettlementRef" : cityRef,
-                 "FindByString": inputValue,
-                 "Limit" : "50",
-                 "Page" : "1"
-            }
-         })
-        return res
-    } catch(error){
-        console.log(error)
-    }
-}
 
 export const saveCounterParty = async ({FirstName,  LastName, Phone} : {FirstName: string,  LastName: string, Phone: string}) => {
     try{
@@ -134,8 +96,8 @@ export const saveInternetDocument = async (
             "methodProperties": {
                 "PayerType" : PayerType,
                 "PaymentMethod" : "Cash",
-                "DateTime" : "дд.мм.рррр",
-                "CargoType" : "Cargo",
+                "DateTime" : DateTime,
+                "CargoType" : "Parcel",
                 "Weight" : Weight,
                 "ServiceType" : "WarehouseWarehouse",
                 "SeatsAmount" : "1",

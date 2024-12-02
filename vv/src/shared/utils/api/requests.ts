@@ -62,16 +62,17 @@ export const getOffers = async ({product_id} : {product_id?: number}) => {
 
 
 export const getProducts = async ({categoriesID, limit, sort, customFields} : {categoriesID?: Array<number>, limit?:number, sort?: 'byQuantity', customFields?: boolean }) => {
-
+    
     const params = {
         filter: categoriesID && {"category_id": `${categoriesID.toString()}`},
         include: customFields && {"include": `customFields`},
-        limit: typeof limit === "number" ? limit + 5 : ''
+        // limit: typeof limit === "number" ? limit + 5 : ''
+        limit: limit
     }
     
     try{
         const res = await crm_instanse.get('/crm/products', {params: params})
-
+        console.log(res)
         if(sort === "byQuantity" && res.data.data.length > 1){
             const sortedArray = res.data.data.sort((a: any, b: any) => b.quantity - a.quantity)
             return sortedArray

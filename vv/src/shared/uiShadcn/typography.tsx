@@ -41,7 +41,7 @@ const TypographyH1: React.FC<Props> = ({className, children}) => {
 
   const TypographyP: React.FC<Props> = ({className, children}) => {
     return (
-      <p className={`leading-7 [&:not(:first-child)]:mt-6 ${className}`}>
+      <p className={`leading-7 ${className}`}>
        {children}
       </p>
     )
